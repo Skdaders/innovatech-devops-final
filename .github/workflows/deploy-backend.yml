@@ -37,12 +37,17 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
+         script: |
+            if ! command -v docker &> /dev/null; then
+              sudo apt-get update -y
+              sudo apt-get install -y docker.io
+              sudo systemctl start docker
+              sudo systemctl enable docker
+              sudo usermod -aG docker ubuntu
+            fi
             docker stop backend || true
             docker rm backend || true
-
             docker pull ${{ secrets.DOCKER_USERNAME }}/innovatech-backend:latest
-
             docker run -d \
               --name backend \
               --restart unless-stopped \
