@@ -38,12 +38,17 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker stop frontend || true
-            docker rm frontend || true
-
-            docker pull ${{ secrets.DOCKER_USERNAME }}/innovatech-frontend:latest
-
-            docker run -d \
+            if ! command -v docker &> /dev/null; then
+              sudo apt-get update -y
+              sudo apt-get install -y docker.io
+              sudo systemctl start docker
+              sudo systemctl enable docker
+              sudo usermod -aG docker ubuntu
+            fi
+            sudo docker stop frontend || true
+            sudo docker rm frontend || true
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/innovatech-frontend:latest
+            sudo docker run -d \
               --name frontend \
               --restart unless-stopped \
               -p 80:80 \
