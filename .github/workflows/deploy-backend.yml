@@ -44,11 +44,9 @@ jobs:
               sudo systemctl enable docker
               sudo usermod -aG docker ubuntu
             fi
-            sudo docker stop backend || true
-            sudo docker rm backend || true
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/innovatech-backend:latest
             sudo docker run -d \
               --name backend \
+              --network innovatech-network \
               --restart unless-stopped \
               -p 3000:3000 \
               -e PORT=3000 \
